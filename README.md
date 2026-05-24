@@ -6,7 +6,7 @@ A full stack personal finance web application with AI-powered spending insights,
 
 ## 🌐 Live Demo
 
-> Coming soon — deployment in progress
+🔗 **Live Demo:** https://finsight-nu-coral.vercel.app
 
 ---
 
@@ -224,8 +224,8 @@ The app runs a scheduled job every day at 8:00 AM that checks for upcoming bills
 
 Built by **[Shweta Biju Thomas]** as a portfolio project demonstrating full stack development with React, Node.js, PostgreSQL, REST APIs, and AI integration.
 
-- GitHub: [@ShwetaBiju7894](https://github.com/ShwetaBiju7894)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/shweta-biju-thomas)
+- GitHub: https://github.com/ShwetaBiju7894
+- LinkedIn: https://linkedin.com/in/shweta-biju-thomas
 
 ---
 
