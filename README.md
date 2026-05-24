@@ -222,7 +222,7 @@ The app runs a scheduled job every day at 8:00 AM that checks for upcoming bills
 
 ## 👤 Author
 
-Built by **[Your Name]** as a portfolio project demonstrating full stack development with React, Node.js, PostgreSQL, REST APIs, and AI integration.
+Built by **[Shweta Biju Thomas]** as a portfolio project demonstrating full stack development with React, Node.js, PostgreSQL, REST APIs, and AI integration.
 
 - GitHub: [@ShwetaBiju7894](https://github.com/ShwetaBiju7894)
 - LinkedIn: [Your LinkedIn](https://linkedin.com/in/shweta-biju-thomas)
