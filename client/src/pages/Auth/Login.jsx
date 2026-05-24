@@ -60,7 +60,7 @@ export default function Login() {
             <span>Finsight</span>
           </div>
           <h1>Take control of your finances</h1>
-          <p>Track spending, set goals, and get AI-powered insights to make smarter financial decisions.</p>
+          <p>Add your transactions, set savings goals, track bills, and get AI-powered insights — all in one place.</p>
 
           <div className="auth-features">
             <div className="auth-feature">

@@ -183,6 +183,59 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* ── Getting started banner (shows only when no data) ── */}
+{transactions.length === 0 && (
+  <div style={{
+    background: 'linear-gradient(135deg, #E6F1FB 0%, #F4F6FA 100%)',
+    border: '1px solid var(--primary-light)',
+    borderRadius: 'var(--radius-lg)',
+    padding: '1.5rem',
+    marginBottom: '1.5rem',
+  }}>
+    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--primary)', marginBottom: 6 }}>
+      👋 Welcome to Finsight! Here's how to get started:
+    </div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem', marginTop: '1rem' }}>
+      {[
+        { step: '1', icon: '💳', title: 'Add a transaction', desc: 'Record your first income or expense', link: '/transactions' },
+        { step: '2', icon: '🎯', title: 'Create a goal',     desc: 'Set a savings target to work towards', link: '/goals'        },
+        { step: '3', icon: '📄', title: 'Add your bills',    desc: 'Track recurring bills and due dates',  link: '/bills'        },
+        { step: '4', icon: '✨', title: 'Get AI insights',   desc: 'Analyze your spending with Gemini AI', link: '/insights'     },
+      ].map(item => (
+        <div key={item.step}
+          onClick={() => navigate(item.link)}
+          style={{
+            background: 'white', borderRadius: 'var(--radius-md)',
+            padding: '1rem', cursor: 'pointer',
+            border: '1px solid var(--border)',
+            transition: 'box-shadow 0.15s',
+            display: 'flex', gap: 10, alignItems: 'flex-start',
+          }}
+          onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}
+          onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+        >
+          <div style={{
+            width: 32, height: 32, borderRadius: '50%',
+            background: 'var(--primary-light)', color: 'var(--primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 12, fontWeight: 700, flexShrink: 0,
+          }}>
+            {item.step}
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 3 }}>
+              {item.icon} {item.title}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              {item.desc}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
       {/* ── Metric cards ───────────────────────────────────────── */}
       <div className="metrics-grid">
         <MetricCard
