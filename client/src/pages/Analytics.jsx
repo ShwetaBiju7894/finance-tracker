@@ -3,8 +3,7 @@ import api from '../api/axios';
 import { formatCurrency } from '../utils/formatters';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend,
-  LineChart, Line, AreaChart, Area,
+  ResponsiveContainer, PieChart, Pie, Cell, Legend, AreaChart, Area,
 } from 'recharts';
 
 // ─── Custom tooltip ───────────────────────────────────────────────
