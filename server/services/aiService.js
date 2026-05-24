@@ -1,12 +1,19 @@
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// ─── ANALYZE SPENDING ─────────────────────────────────────────────────────────
+// ─── Helper ───────────────────────────────────────────────────────
+const ask = async (prompt) => {
+  const model  = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const result = await model.generateContent(prompt);
+  return result.response.text();
+};
+
+// ─── ANALYZE SPENDING ─────────────────────────────────────────────
 const analyzeSpending = async ({ transactions, summary, categories, goals }) => {
   const prompt = `
-    You are a friendly personal finance advisor. Analyze this user's financial data 
-    and give practical, specific insights. Be conversational and encouraging, not robotic.
+    You are a friendly personal finance advisor. Analyze this user's financial data
+    and give practical, specific insights. Be conversational and encouraging.
 
     MONTHLY SUMMARY:
     - Total Income:   $${summary.total_income}
@@ -16,93 +23,55 @@ const analyzeSpending = async ({ transactions, summary, categories, goals }) => 
     TOP SPENDING CATEGORIES:
     ${categories.map(c => `- ${c.name}: $${c.total} (${c.percentage}%)`).join('\n')}
 
-    RECENT TRANSACTIONS (last 10):
+    RECENT TRANSACTIONS:
     ${transactions.slice(0, 10).map(t =>
-      `- ${t.type === 'expense' ? '-' : '+'}$${t.amount} | ${t.category_name || 'Uncategorized'} | ${t.note || 'No note'} | ${t.date}`
+      `- ${t.type === 'expense' ? '-' : '+'}$${t.amount} | ${t.category_name || 'Uncategorized'} | ${t.note || ''}`
     ).join('\n')}
 
     SAVINGS GOALS:
     ${goals.map(g => `- ${g.title}: $${g.current_amount} of $${g.target_amount} (${g.percentage}%)`).join('\n')}
 
-    Please provide exactly 4 insights in this JSON format. Return ONLY the JSON, no other text:
-    {
-      "insights": [
-        {
-          "type": "positive" | "warning" | "tip" | "goal",
-          "title": "short title max 6 words",
-          "message": "specific actionable insight 1-2 sentences"
-        }
-      ]
-    }
+    Return ONLY a raw JSON object. No markdown. No backticks. No explanation. Just JSON:
+    {"insights":[{"type":"positive","title":"short title max 6 words","message":"specific insight 1-2 sentences"},{"type":"warning","title":"short title","message":"specific insight"},{"type":"tip","title":"short title","message":"specific insight"},{"type":"goal","title":"short title","message":"specific insight"}]}
   `;
 
-  const response = await client.messages.create({
-    model:      'claude-sonnet-4-20250514',
-    max_tokens: 1024,
-    messages:   [{ role: 'user', content: prompt }],
-  });
-
-  const text = response.content[0].text.trim();
-
-  // Safely parse JSON response
+  const text  = await ask(prompt);
   const clean = text.replace(/```json|```/g, '').trim();
   return JSON.parse(clean);
 };
 
-// ─── MONTHLY SUMMARY ──────────────────────────────────────────────────────────
+// ─── MONTHLY SUMMARY ──────────────────────────────────────────────
 const getMonthlySummary = async ({ summary, topCategory, previousSummary }) => {
   const prompt = `
-    You are a personal finance advisor. Write a short, friendly monthly summary 
-    for this user's finances. Be specific with numbers. Max 3 sentences.
+    You are a personal finance advisor. Write a short friendly monthly summary in max 3 sentences.
 
     This month:  Income $${summary.total_income} | Expenses $${summary.total_expenses} | Savings $${summary.net_savings}
     Last month:  Income $${previousSummary.income} | Expenses $${previousSummary.expenses} | Savings $${previousSummary.savings}
-    Top category: ${topCategory?.name} at $${topCategory?.total}
+    Top spending category: ${topCategory?.name} at $${topCategory?.total}
 
-    Return ONLY a JSON object, no other text:
-    { "summary": "your 3 sentence summary here" }
+    Return ONLY a raw JSON object. No markdown. No backticks:
+    {"summary":"your 3 sentence summary here"}
   `;
 
-  const response = await client.messages.create({
-    model:      'claude-sonnet-4-20250514',
-    max_tokens: 256,
-    messages:   [{ role: 'user', content: prompt }],
-  });
-
-  const text  = response.content[0].text.trim();
+  const text  = await ask(prompt);
   const clean = text.replace(/```json|```/g, '').trim();
   return JSON.parse(clean);
 };
 
-// ─── BUDGET ADVICE ────────────────────────────────────────────────────────────
+// ─── BUDGET ADVICE ────────────────────────────────────────────────
 const getBudgetAdvice = async ({ income, expenses, goals }) => {
   const prompt = `
-    You are a personal finance advisor. Based on this user's income and spending,
-    suggest a simple monthly budget. Use the 50/30/20 rule as a starting point
-    but adjust based on their actual situation.
+    You are a personal finance advisor. Suggest a monthly budget using 50/30/20 rule.
 
     Monthly income:   $${income}
     Current expenses: $${expenses}
     Goals: ${goals.map(g => g.title).join(', ')}
 
-    Return ONLY a JSON object, no other text:
-    {
-      "advice": "2 sentence personalized advice",
-      "suggested_budget": {
-        "needs":   { "amount": number, "percentage": number },
-        "wants":   { "amount": number, "percentage": number },
-        "savings": { "amount": number, "percentage": number }
-      }
-    }
+    Return ONLY a raw JSON object. No markdown. No backticks:
+    {"advice":"2 sentence personalized advice","suggested_budget":{"needs":{"amount":0,"percentage":50},"wants":{"amount":0,"percentage":30},"savings":{"amount":0,"percentage":20}}}
   `;
 
-  const response = await client.messages.create({
-    model:      'claude-sonnet-4-20250514',
-    max_tokens: 512,
-    messages:   [{ role: 'user', content: prompt }],
-  });
-
-  const text  = response.content[0].text.trim();
+  const text  = await ask(prompt);
   const clean = text.replace(/```json|```/g, '').trim();
   return JSON.parse(clean);
 };
